@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Data Platform - Premium Preparation</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Auth Section -->
+        <section id="auth-section" class="fade-in">
+            <div class="auth-card glass-morphism">
+                <h1
+                    style="text-align: center; margin-bottom: 2rem; font-weight: 700; background: linear-gradient(45deg, #6366f1, #10b981); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                    AI Data Platform</h1>
+                <div id="login-form">
+                    <input type="email" id="login-email" placeholder="Email" required>
+                    <input type="password" id="login-password" placeholder="Password" required>
+                    <button class="btn-primary" style="width: 100%;" onclick="app.login()">Sign In</button>
+                    <p style="text-align: center; margin-top: 1rem; color: var(--text-muted);">
+                        Don't have an account? <a href="#" onclick="app.showRegister()"
+                            style="color: var(--primary);">Register</a>
+                    </p>
+                </div>
+                <div id="register-form" style="display: none;">
+                    <input type="email" id="reg-email" placeholder="Email" required>
+                    <input type="password" id="reg-password" placeholder="Password" required>
+                    <button class="btn-primary" style="width: 100%;" onclick="app.register()">Create Account</button>
+                    <p style="text-align: center; margin-top: 1rem; color: var(--text-muted);">
+                        Already have an account? <a href="#" onclick="app.showLogin()"
+                            style="color: var(--primary);">Login</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="container fade-in">
+            <nav class="nav">
+                <h2 style="font-weight: 700;">Dashboard</h2>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <span id="user-display" style="color: var(--text-muted);"></span>
+                    <button onclick="app.logout()" class="glass-morphism"
+                        style="padding: 0.5rem 1rem; color: var(--danger); border-color: var(--danger);">Logout</button>
+                </div>
+            </nav>
+
+            <div class="stats-grid">
+                <div class="stat-card glass-morphism">
+                    <div style="color: var(--text-muted); font-size: 0.875rem;">Total Datasets</div>
+                    <div id="total-count" style="font-size: 1.5rem; font-weight: 600; margin-top: 0.5rem;">0</div>
+                </div>
+                <div class="stat-card glass-morphism">
+                    <div style="color: var(--text-muted); font-size: 0.875rem;">System Status</div>
+                    <div id="total-count"
+                        style="font-size: 1.5rem; font-weight: 600; margin-top: 0.5rem; color: var(--accent);">Active
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div
+                style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+                <button onclick="app.switchTab('all')" id="tab-all" class="glass-morphism"
+                    style="padding: 0.5rem 1.5rem; background: var(--glass-heavy);">All Datasets</button>
+                <button onclick="app.switchTab('ai')" id="tab-ai" class="glass-morphism"
+                    style="padding: 0.5rem 1.5rem; background: transparent;">AI Analysis ✨</button>
+            </div>
+
+            <!-- All Datasets View -->
+            <div id="all-datasets-view">
+                <div class="dropzone" id="dropzone">
+                    <p style="color: var(--text-muted);">Drag and drop your CSV here or <b>click to browse</b></p>
+                    <input type="file" id="file-input" style="display: none;" accept=".csv">
+                </div>
+
+                <h3 style="margin-bottom: 1.5rem;">Your Datasets</h3>
+                <div class="dataset-grid" id="dataset-grid">
+                    <!-- Datasets will be injected here -->
+                </div>
+            </div>
+
+            <!-- AI Analysis View -->
+            <div id="ai-analysis-view" style="display: none;">
+                <div class="glass-morphism" style="padding: 2rem; border-radius: 16px; margin-bottom: 2rem;">
+                    <h3 style="margin-bottom: 1rem;">AI Data Insights</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Select a cleaned dataset below and
+                        describe what you want the AI to analyze.</p>
+
+                    <textarea id="ai-prompt" placeholder="Analyze this data and make a report..."
+                        style="width: 100%; height: 120px; background: var(--glass-heavy); border: 1px solid var(--border-color); border-radius: 12px; color: white; padding: 1rem; margin-bottom: 1.5rem; resize: none; font-family: inherit;"></textarea>
+
+                    <button class="btn-primary" id="generate-btn"
+                        style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;"
+                        onclick="app.generateAIReport()">
+                        <span id="btn-text">Generate AI Report</span>
+                        <span id="btn-icon">✨</span>
+                    </button>
+
+                    <!-- AI Results Area -->
+                    <div id="ai-results">
+                        <div
+                            style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                            <span style="font-weight: 600; color: var(--accent);">AI Report Results</span>
+                            <span id="generation-time" style="font-size: 0.75rem; color: var(--text-muted);"></span>
+                        </div>
+                        <div id="ai-report-content" style="color: var(--text-main); line-height: 1.6;"></div>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 1.5rem;">Ready for Analysis (Cleaned Only)</h3>
+                <div class="dataset-grid" id="ai-dataset-grid">
+                    <!-- Cleaned datasets only will be injected here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Details Modal -->
+        <div id="modal-overlay" class="modal-overlay">
+            <div class="modal-content glass-morphism">
+                <button class="close-btn" onclick="app.closeModal()">&times;</button>
+                <h2 id="modal-title" style="margin-bottom: 1rem;">Dataset Details</h2>
+
+                <div id="modal-body">
+                    <div class="metadata-grid" id="metadata-display">
+                        <!-- Metadata dynamic inject -->
+                    </div>
+
+                    <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Processing Logs</h4>
+                    <div id="logs-display"
+                        style="max-height: 200px; overflow-y: auto; background: var(--glass); border-radius: 12px;">
+                        <!-- Logs dynamic inject -->
+                    </div>
+
+                    <div class="cleaning-options">
+                        <h4 style="margin-bottom: 1rem;">Advanced Cleaning</h4>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="clean-duplicates" checked>
+                            <label for="clean-duplicates">Remove Duplicates</label>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem;">Handling Missing
+                                Values</label>
+                            <select id="clean-missing" class="glass-morphism"
+                                style="width: 100%; padding: 0.5rem; color: white;">
+                                <option value="drop">Drop Rows</option>
+                                <option value="mean">Fill with Mean</option>
+                                <option value="zeros">Fill with Zeros</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary" style="width: 100%;" onclick="app.applyCleaning()">Process &
+                            Clean</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: ai_data_platform_web
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./app:/app/app
+      - ./static:/app/static
+      - ./uploads:/app/uploads
+      - ./cleaned:/app/cleaned
+      - ./main.py:/app/main.py
+      - ./init_db.py:/app/init_db.py
+    environment:
+      - PORT=8001
+      - DATABASE_URL=postgresql://dbuser:dbpassword@db:5432/ai_data_platform
+      # Pointing to the host's Ollama instance. Use host.docker.internal for Windows/Mac
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - SECRET_KEY=supersecretkey_docker
+    command: bash -c "python init_db.py && uvicorn main:app --host 0.0.0.0 --port 8001"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  ai_model:
+    build:
+      context: ./integrated-Analytics-Ai-System
+      dockerfile: Dockerfile
+    container_name: ai_data_platform_ai_system
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./integrated-Analytics-Ai-System:/app
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+
+  db:
+    image: postgres:latest
+    container_name: ai_data_platform_db
+    environment:
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: dbpassword
+      POSTGRES_DB: ai_data_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U dbuser -d ai_data_platform" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

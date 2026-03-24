@@ -17,8 +17,13 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
+    if user.username:
+        db_username = db.query(User).filter(User.username == user.username).first()
+        if db_username:
+            raise HTTPException(status_code=400, detail="Username already taken")
+    
     hashed_password = get_password_hash(user.password)
-    new_user = User(email=user.email, password_hash=hashed_password)
+    new_user = User(email=user.email, password_hash=hashed_password, username=user.username)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -37,6 +42,6 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
         )
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
+        data={"sub": user.email, "username": user.username}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}

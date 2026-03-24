@@ -1,6 +1,6 @@
 from app.database import engine, Base
 from app.models.user import User
-from app.models.dataset import Dataset, DatasetMetadata, ProcessingLog
+from app.models.dataset import Dataset, DatasetMetadata, ProcessingLog, DatasetShare, ActivityLog
 
 def init_db():
     print("Creating tables in database...")

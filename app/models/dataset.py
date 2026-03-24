@@ -18,6 +18,7 @@ class Dataset(Base):
     owner = relationship("User", back_populates="datasets")
     metadata_info = relationship("DatasetMetadata", back_populates="dataset", uselist=False)
     logs = relationship("ProcessingLog", back_populates="dataset")
+    shares = relationship("DatasetShare", back_populates="dataset")
 
 
 class DatasetMetadata(Base):
@@ -44,3 +45,28 @@ class ProcessingLog(Base):
     timestamp = Column(DateTime, default=datetime.utcnow)
 
     dataset = relationship("Dataset", back_populates="logs")
+
+
+class DatasetShare(Base):
+    __tablename__ = "dataset_shares"
+
+    id = Column(Integer, primary_key=True, index=True)
+    dataset_id = Column(Integer, ForeignKey("datasets.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    permission = Column(String, default="view")  # view, edit
+    shared_at = Column(DateTime, default=datetime.utcnow)
+
+    dataset = relationship("Dataset", back_populates="shares")
+    user = relationship("User")
+
+
+class ActivityLog(Base):
+    __tablename__ = "activity_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    action = Column(String, nullable=False)  # upload, clean, share, ai_query, export
+    details = Column(String)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User")
